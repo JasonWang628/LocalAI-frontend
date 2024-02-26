@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, Fragment } from "react";
 import "./index.css";
 
-const host = process.env.REACT_APP_API_HOST;
+const host = "http://10.0.0.19:8080";
 const temperature = 0.7;
 
 const ChatGptInterface = () => {
@@ -109,6 +109,98 @@ const ChatGptInterface = () => {
     }
   };
 
+  const handleGenerate = async () => {
+    // Add user input to messages
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { role: "user", content: input },
+    ]);
+
+    // Reset error state and set loading state
+    setError(null);
+    setIsLoading(true);
+
+    const emailRequest = "Wirte a email as Nike to your customer Ken to introduce some new release shoes.";
+    try {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: 'luna-ai-llama2',
+          messages: [
+            {
+              role: "user",
+              content: emailRequest,
+            },
+          ],
+          temperature,
+          stream: true,
+        }),
+      };
+
+      const response = await fetch(`${host}/v1/chat/completions`, requestOptions);
+
+      const reader = response.body.getReader();
+      let partialData = "";
+      let done = false;
+      let assistantResponse = "";
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+
+        done = readerDone;
+
+        if (value) {
+          const chunk = new TextDecoder().decode(value);
+          partialData += chunk;
+          const lines = partialData.split("\n");
+
+          for (let i = 0; i < lines.length - 1; i++) {
+            const line = lines[i];
+            if (line.startsWith("data: ")) {
+              const jsonStr = line.substring("data: ".length);
+              if (jsonStr == "[DONE]") {
+                done = true;
+              } else {
+                const json = JSON.parse(jsonStr);
+
+                // Check if the response contains choices and delta fields
+                if (
+                  json.choices &&
+                  json.choices.length > 0 &&
+                  json.choices[0].delta
+                ) {
+                  const token = json.choices[0].delta.content;
+                  if (token !== undefined) {
+                    assistantResponse += token;
+                    setCurrentAssistantMessage(assistantResponse);
+                  }
+                }
+              }
+            }
+          }
+
+          partialData = lines[lines.length - 1];
+        }
+      }
+
+      // Add assistant response to messages
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { role: "assistant", content: assistantResponse },
+      ]);
+
+      // // Clear input field and currentAssistantMessage
+      // setInput("");
+      // setCurrentAssistantMessage("");
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Failed to fetch response. Please try again: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const fetchModels = async () => {
     try {
       const response = await fetch(`${host}/v1/models`);
@@ -180,7 +272,6 @@ const ChatGptInterface = () => {
   };
 
 
-
   const handleGalleryChange = (event) => {
     const selectedModel = event.target.value;
     console.log("the selected model is:",selectedModel);
@@ -210,8 +301,60 @@ const ChatGptInterface = () => {
   };
 
   return (
+    // <div className="request-input">
+    //   {/* Render vender name */}
+    //   { <input
+    //       type="text"
+    //       value={vender-input}
+    //       className="vender-input"
+    //       placeholder="Enter your brand name"
+    //       disabled={isLoading}
+    //     />
+
+    //   }
+    // </div>
+    
+
     <div className="chat-page">
-      {/* Render dropdown list for models */}
+      <div className="request-input">
+      <p className="company-name-label"> Company Name :</p>
+      <input
+          type="text"
+          onChange={handleInputChange}
+          className="company-name-field"
+          placeholder="Enter Company Name"
+          disabled={isLoading}
+        />
+      <p> Customer Name :</p>
+        <input
+          type="text"
+          onChange={handleInputChange}
+          className="customer-name-field"
+          placeholder="Enter Customer Name"
+          disabled={isLoading}
+        />
+        
+        <p>
+          Subject :
+        </p>
+
+        <input
+          type="text"
+          onChange={handleInputChange}
+          className="subject-field"
+          placeholder="Enter Subject"
+          disabled={isLoading}
+        />
+
+        <button
+          onClick={handleGenerate}
+          className="submit-button"
+        >
+          Generate
+        </button>
+      </div>
+
+      {/* Render dropdown list for models
       <div className="model-dropdown">
         <select className="left-dropdown"
           value={selectedModel}
@@ -238,11 +381,11 @@ const ChatGptInterface = () => {
           </option>
         ))}
       </select>
-      </div>
+      </div> */}
 
       <div className="chat-container" ref={chatContainerRef}>
         <div className="chat-messages">
-          {/* Render user input and chatbot responses */}
+          {/* Render user input and chatbot responses
           {messages.map((message, index) => (
             <div
               key={index}
@@ -257,10 +400,10 @@ const ChatGptInterface = () => {
                 {renderMessageContent(message.content)}
               </span>
             </div>
-          ))}
+          ))} */}
           {isLoading && (
             <div className="chat-message assistant-message">
-              <span className="message-role">LocalAI:</span>
+              {/* <span className="message-role">LocalAI:</span> */}
               <span className="message-content">
                 {renderMessageContent(currentAssistantMessage)}
               </span>
@@ -269,7 +412,7 @@ const ChatGptInterface = () => {
         </div>
       </div>
       <div className="chat-input">
-        {/* Render input field and submit button */}
+        {/* Render input field and submit button
         <input
           type="text"
           value={input}
@@ -284,7 +427,7 @@ const ChatGptInterface = () => {
           disabled={!input || isLoading}
         >
           {isLoading ? "Submitting..." : "Submit"}
-        </button>
+        </button> */}
       </div>
       {/* Render error message if there's an error */}
       {error && <div className="error-message">{error}</div>}

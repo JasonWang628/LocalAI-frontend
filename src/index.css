@@ -19,8 +19,54 @@ code {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #1d1d1d; /* Update background color to dark */
+  background-color: #6a7779; /* Update background color to dark */
   color: #fff; /* Update text color to white */
+}
+
+.request-input
+{
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.company-name-label
+{
+  margin-left: 20px;
+}
+
+.company-name-field
+{
+  flex: 1;
+  padding: 10px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  border: none;
+  background-color: #292929;
+  color: #fff;
+}
+
+.customer-name-field
+{
+  flex: 1;
+  padding: 10px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  border: none;
+  background-color: #292929;
+  color: #fff;
+}
+
+.subject-field
+{
+  flex: 1;
+  padding: 10px;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  border: none;
+  background-color: #292929;
+  color: #fff;
 }
 
 .model-dropdown select {
@@ -44,7 +90,7 @@ code {
   -ms-overflow-style: none; /* Internet Explorer 10+ */
   scrollbar-width: none; /* Firefox */
   overflow-y: scroll;
-  background-color: #292929; /* Update background color to dark */
+  background-color: #e1eaeb; /* Update background color to dark */
   border-radius: 10px;
   padding: 20px;
   box-sizing: border-box;
@@ -104,14 +150,14 @@ code {
   padding: 10px 20px;
   border-radius: 5px;
   border: none;
-  background-color: #1db954; /* Update background color to green */
+  background-color: #8bdedc; /* Update background color to green */
   color: #fff;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .submit-button:hover {
-  background-color: #1ed760; /* Update background color on hover */
+  background-color: #1ca4a4; /* Update background color on hover */
 }
 
 /* CSS for error message */
